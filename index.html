@@ -1,107 +1,94 @@
 <!DOCTYPE html>
 <html>
 <head>
-<style>
+  <style>
 
-body {
-  margin: 0px;
-}
-.chart rect {
-  fill: steelblue;
-}
+    body {
+      margin: 0px;
+    }
+    .chart rect {
+      fill: steelblue;
+    }
 
-.chart text {
-  fill: black;
-  font: 40px arial;
-  text-anchor: end;
-}
+    .chart text {
+      fill: black;
+      font: 40px arial;
+      text-anchor: end;
+    }
+    .chart div {
+      font: 10px sans-serif;
+      background-color: steelblue;
+      text-align: right;
+      padding: 3px;
+      margin: 1px;
+      color: white;
+    }
 
-</style>
+  </style>
 </head>
 <body>
-<svg class="chart"></svg>
-<script src="js/d3.v3.min.js"></script>
-<script>
+  <div class="chart"></div>
+  <script src="js/d3.v3.min.js"></script>
+  <script src="js/jquery.js"></script>
+  <script>
 
-var width = window.innerWidth ||
-            html.clientWidth  ||
-            body.clientWidth  ||
-            screen.availWidth;
+    var width = window.innerWidth ||
+    html.clientWidth  ||
+    body.clientWidth  ||
+    screen.availWidth;
 
-var height = window.innerHeight ||
-             html.clientHeight  ||
-             body.clientHeight  ||
-             screen.availHeight;
+    var height = window.innerHeight ||
+    html.clientHeight  ||
+    body.clientHeight  ||
+    screen.availHeight;
 
 
-var x = d3.scale.linear()
+    var x = d3.scale.linear()
     .range([0, width]);
 
-var chart = d3.select(".chart").attr("width", width);
-chart.attr("height", height);
+    var chart = d3.select(".chart").attr("width", width);
+    chart.attr("height", height);
 
-d3.csv("data/data.csv", function(data) {
-    console.log(data);
-});
-
-var data = ["This", "is a", "test"];
-
-//var data = [4, 8, 15, 16, 23, 42];
-
-var d = new Date();
-
-var time = d.getTime()/1000;
+    var data = ["a"];
 
 
-var bar = chart.selectAll("g").data(data).enter().append("g");
-var text = null;
-var box = null;
 
 
-// start animation for text entering at 0.5s after page load
-setTimeout(sendIn, 500);
 
-function addText() {
-  bar.append("rect")
-    .attr("x", function(d) { return -100; })
-    .attr("y", function(d) { return 0 })
-    .attr("width", 100)
-    .attr("height", 100);
-  box = bar.selectAll("rect");
+    var d = new Date();
 
-  bar.append("text")
-    .attr("x", function(d) { return -100; })
-    .attr("y", function(d) { return data.indexOf(d)*20; })
-    .attr("dy", ".35em")
-    .text(function(d) { return d; });
+    var time = d.getTime()/1000;
 
-  text = bar.selectAll("text");
-}
 
-function sendIn() {
-  addText();
+    var bar = null;
+    var text = null;
+    var box = null;
+    var x = d3.scale.linear()
+    .domain([0, d3.max(data)])
+    .range([0, 420]);
 
-  text.transition().attr("x", function(d) { return width/2; })
-  .attr("y", function(d) { return data.indexOf(d)*35+height/2; });
 
-    setTimeout(animateStart,3000);
-}
+    $(function() {
+      d3.csv("http://cdn.yoerik.com/ISS/data.csv", function(newData) {
+        data = newData;
+        init();
+      });
+    });
 
-function animateStart() {
-  setInterval(animate,(1000/60.0));
-}
+    function init() {
+      console.log(data);
+      chart = chart.selectAll("div").data(data).enter().append("div")
+      .style("width", function(d) { return d["BuildingComments"]*50+10 + "px"; })
+      .text(function(d) { return d["BuildingComments"]; });
+      /*
+      chart.style("width", function(d) { return d["BuildingComments"] * 20 + "px"; })
+      .text(function(d) { return d; });*/
 
-function animate() {
-	var d = new Date();
-	var time = d.getTime()/1000;
-	//console.log(time);
 
-	text.attr("transform", function(d, i) { return "translate(" + (100*Math.sin(time*2)) + "," + (100*Math.cos(time*2)) + ")"; });
 
-  text.attr("transform", function(d, i) { return "translate(" + (100*Math.sin(time*2)) + "," + (100*Math.cos(time*2)) + ")"; });
+    }
 
-}
 
-</script>
+  </script>
 </body>
 </html>
