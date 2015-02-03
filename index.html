@@ -22,27 +22,42 @@
       padding: 0px;
       margin: 0px;
       color: white;
-      width: 2px;
+      width: 5px;
       float:left;
     }
 
   </style>
 </head>
 <body>
-  <div class="chart"></div>
+<button onclick="setBlock('a');">Block A</button>
+<button onclick="setBlock('b');">Block B</button>
+<button onclick="setBlock('c');">Block C</button>
+<button onclick="setBlock('d');">Block D</button>
+<button onclick="setBlock('e');">Block E</button><br>
+
+<button onclick="setType('SynthesisComments');">Synthesis Comments</button>
+<button onclick="setType('BuildingComments');">Building Comments</button>
+<button onclick="setType('ReferenceComments');">Reference Comments</button>
+<button onclick="setType('NewIdeas');">New Ideas</button>
+<button onclick="setType('ClarifyingQuestions');">Clarifying Questions</button>
+<button onclick="setType('Objections');">Objections</button>
+
+<br>
+<br>
+  <div class="chart" id="blockA"></div>
   <script src="js/d3.v3.min.js"></script>
   <script src="js/jquery.js"></script>
   <script>
 
-    var width = window.innerWidth ||
-    html.clientWidth  ||
-    body.clientWidth  ||
-    screen.availWidth;
+      var width = window.innerWidth ||
+      html.clientWidth  ||
+      body.clientWidth  ||
+      screen.availWidth;
 
-    var height = window.innerHeight ||
-    html.clientHeight  ||
-    body.clientHeight  ||
-    screen.availHeight;
+      var height = window.innerHeight ||
+      html.clientHeight  ||
+      body.clientHeight  ||
+      screen.availHeight;
 
 
     var x = d3.scale.linear()
@@ -52,44 +67,45 @@
     chart.attr("height", height);
 
     var data = [];
-
-
-
-
-
-    var d = new Date();
-
-    var time = d.getTime()/1000;
-
-
-    var bar = null;
-    var text = null;
-    var box = null;
-
+    var section = "a";
+    var commentType = "BuildingComments";
 
     $(function() {
-      d3.csv("http://cdn.yoerik.com/ISS/data.csv", function(newData) {
-        data = newData;
+      //d3.csv("http://cdn.yoerik.com/ISS/data.csv", function(newData) {
         init();
-      });
     });
+    function loadData() {
+      d3.csv("http://casacraft.homeip.net:8080/ISSData/getdata.php?Section="+section, function(newData) {
+        data = newData;
+        console.log(data);
+        update();
+      });
+    }
 
     function x(value) {
       return value*50+10;
     }
+    function setBlock(block) {
+      section = block;
+      loadData();
+    }
+    function setType(type) {
+      commentType = type;
+      loadData();
+    }
 
     function init() {
-      console.log(data);
-      chart=chart.selectAll("div").data(data).enter().append("div");
+      loadData();
 
+    }
 
-      chart.style("height", function(d) { return d["BuildingComments"]*50+10 + "px"; });
-      chart.style("margin-top", function(d) { return (7-d["BuildingComments"])*50+10 + "px"; });
+    function update() {
+      d3.select(".chart").selectAll("div").remove();
+      chart = d3.select(".chart").selectAll("div").data(data).enter().append("div");
+      //chart = chart.transition();
 
-
-      
-      //chart.text(function(d) { return d["BuildingComments"]; });
-
+      chart.style("height", function(d) { return d[commentType]*50+10 + "px"; });
+      chart.style("margin-top", function(d) { return (7-d[commentType])*50+10 + "px"; });
     }
 
 
