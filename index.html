@@ -25,29 +25,39 @@
       width: 5px;
       float:left;
     }
-
+    .myGraph {
+      margin:3%;
+    }
   </style>
 </head>
 <body>
-<button onclick="setBlock('a');">Block A</button>
-<button onclick="setBlock('b');">Block B</button>
-<button onclick="setBlock('c');">Block C</button>
-<button onclick="setBlock('d');">Block D</button>
-<button onclick="setBlock('e');">Block E</button><br>
+  <div class="myGraph">
+    Here is a graph that I wrote the display for in D3js. It shows the number of comments in every tracker entry vs time.  You can set what types of comments it shows with the buttons below. (It doesn't show anything too interesting YET...)<br><br>
+    <button onclick="setBlock('a');">Block A</button>
+    <button onclick="setBlock('b');">Block B</button>
+    <button onclick="setBlock('c');">Block C</button>
+    <button onclick="setBlock('d');">Block D</button>
+    <button onclick="setBlock('e');">Block E</button>
+    <button onclick="setBlock('');">All</button><br>
 
-<button onclick="setType('SynthesisComments');">Synthesis Comments</button>
-<button onclick="setType('BuildingComments');">Building Comments</button>
-<button onclick="setType('ReferenceComments');">Reference Comments</button>
-<button onclick="setType('NewIdeas');">New Ideas</button>
-<button onclick="setType('ClarifyingQuestions');">Clarifying Questions</button>
-<button onclick="setType('Objections');">Objections</button>
+    <button onclick="setType('SynthesisComments');">Synthesis Comments</button>
+    <button onclick="setType('BuildingComments');">Building Comments</button>
+    <button onclick="setType('ReferenceComments');">Reference Comments</button>
+    <button onclick="setType('NewIdeas');">New Ideas</button>
+    <button onclick="setType('ClarifyingQuestions');">Clarifying Questions</button>
+    <button onclick="setType('Objections');">Objections</button>
 
-<br>
-<br>
-  <div class="chart" id="blockA"></div>
-  <script src="js/d3.v3.min.js"></script>
-  <script src="js/jquery.js"></script>
-  <script>
+    <br>
+    <br>
+    <div class="chart" id="blockA"></div>
+    <div style="clear:both;"></div><br><br></div>
+    <br>
+    Graph used for assignment:<br><br>
+    <iframe frameborder=0 width="100%" height="400px" src="https://docs.google.com/spreadsheets/d/1GvFDu_Lhp21qheqtZdGxbrqLn72xm-0Qaw1nqBzwJK0/pubchart?oid=1218658220&amp;format=interactive"></iframe>
+
+    <script src="js/d3.v3.min.js"></script>
+    <script src="js/jquery.js"></script>
+    <script>
 
       var width = window.innerWidth ||
       html.clientWidth  ||
@@ -60,48 +70,52 @@
       screen.availHeight;
 
 
-    var x = d3.scale.linear()
-    .range([0, width]);
+      var x = d3.scale.linear()
+      .range([0, width]);
 
-    var chart = d3.select(".chart").attr("width", width);
-    chart.attr("height", height);
+      var chart = d3.select(".chart").attr("width", width);
+      chart.attr("height", height);
 
-    var data = [];
-    var section = "a";
-    var commentType = "BuildingComments";
+      var data = [];
+      var section = "a";
+      var commentType = "BuildingComments";
 
-    $(function() {
+      $(function() {
       //d3.csv("http://cdn.yoerik.com/ISS/data.csv", function(newData) {
         init();
-    });
-    function loadData() {
-      d3.csv("http://casacraft.homeip.net:8080/ISSData/getdata.php?Section="+section, function(newData) {
-        data = newData;
-        console.log(data);
-        update();
       });
-    }
+      function loadData() {
+        url = "http://yoerik.com/ISSDataVisualization/getdata.php";
+        if (section != "") {
+          url += "?Section="+section;
+        }
+        d3.csv(url, function(newData) {
+          data = newData;
+          console.log(data);
+          update();
+        });
+      }
 
-    function x(value) {
-      return value*50+10;
-    }
-    function setBlock(block) {
-      section = block;
-      loadData();
-    }
-    function setType(type) {
-      commentType = type;
-      loadData();
-    }
+      function x(value) {
+        return value*50+10;
+      }
+      function setBlock(block) {
+        section = block;
+        loadData();
+      }
+      function setType(type) {
+        commentType = type;
+        loadData();
+      }
 
-    function init() {
-      loadData();
+      function init() {
+        loadData();
 
-    }
+      }
 
-    function update() {
-      d3.select(".chart").selectAll("div").remove();
-      chart = d3.select(".chart").selectAll("div").data(data).enter().append("div");
+      function update() {
+        d3.select(".chart").selectAll("div").remove();
+        chart = d3.select(".chart").selectAll("div").data(data).enter().append("div");
       //chart = chart.transition();
 
       chart.style("height", function(d) { return d[commentType]*50+10 + "px"; });
